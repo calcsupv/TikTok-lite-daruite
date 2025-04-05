@@ -80,7 +80,7 @@
     <p id="result"></p>
   </div>
 
-  <div class="version">v0.0.2</div>
+  <div class="version">v0.0.3</div>
 
   <script>
     async function checkTikTokLite() {
@@ -100,23 +100,24 @@
         const inputUrl = new URL(input);
         const inputHost = inputUrl.hostname;
 
-        // 入力URLが lite.tiktok.com を含む場合は即判定OK
+        // 直接 lite.tiktok.com に含まれている場合は即判定OK
         if (inputHost.includes('lite.tiktok.com')) {
           result.textContent = 'このURLは TikTok Lite（短縮URL含む）です。';
           result.style.color = 'green';
           return;
         }
 
-        // それ以外はリダイレクト先を確認
+        // 他の短縮URLでもリダイレクトして確認
         const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(input)}`, {
-          method: 'GET',
+          method: 'GET', // GETメソッドでリダイレクト追跡
           redirect: 'follow',
         });
 
         const finalUrl = response.url;
         const finalHost = new URL(finalUrl).hostname;
 
-        if (finalHost.includes('lite.tiktok.com')) {
+        // 最終URLに lite.tiktok.com が含まれていれば「TikTok Lite」
+        if (finalUrl.includes('lite.tiktok.com')) {
           result.textContent = 'このURLは TikTok Lite にリダイレクトされます。';
           result.style.color = 'green';
         } else {
